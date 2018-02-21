@@ -474,6 +474,10 @@ func (gp *GenericPool) createPool() error {
 	// pod still runs user functions.
 	var gracePeriodSeconds int64 = 6 * 60
 
+	podAnnotation := map[string]string{
+		"sidecar.istio.io/inject": strconv.FormatBool(gp.env.Spec.AllowedAccessExternalNetwork),
+	}
+
 	deployment := &v1beta1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   poolDeploymentName,
@@ -486,7 +490,8 @@ func (gp *GenericPool) createPool() error {
 			},
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: gp.labelsForPool,
+					Labels:      gp.labelsForPool,
+					Annotations: podAnnotation,
 				},
 				Spec: apiv1.PodSpec{
 					Volumes: []apiv1.Volume{
@@ -525,7 +530,6 @@ func (gp *GenericPool) createPool() error {
 									Name:      "secrets",
 									MountPath: gp.sharedSecretPath,
 								},
-
 								{
 									Name:      "config",
 									MountPath: gp.sharedCfgMapPath,
@@ -559,12 +563,10 @@ func (gp *GenericPool) createPool() error {
 									Name:      "userfunc",
 									MountPath: gp.sharedMountPath,
 								},
-
 								{
 									Name:      "secrets",
 									MountPath: gp.sharedSecretPath,
 								},
-
 								{
 									Name:      "config",
 									MountPath: gp.sharedCfgMapPath,
