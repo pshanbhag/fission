@@ -509,7 +509,6 @@ func (gp *GenericPool) createPool() error {
 								EmptyDir: &apiv1.EmptyDirVolumeSource{},
 							},
 						},
-
 						{
 							Name: "config",
 							VolumeSource: apiv1.VolumeSource{
